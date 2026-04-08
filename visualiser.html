@@ -274,6 +274,9 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
 #export-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; margin-left: auto; display: none; transition: background var(--transition); }
 #export-btn:hover { background: rgba(255,255,255,0.25); }
 #export-btn.visible { display: block; }
+/* ========== NEW PATIENT BUTTON ========== */
+#new-patient-btn { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.5); padding: 6px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; display: none; transition: background var(--transition); }
+#new-patient-btn:hover { background: rgba(212,53,28,0.5); border-color: #d4351c; }
 </style>
 </head>
 <body>
@@ -289,6 +292,7 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
     <div id="header-title">Medicus Patient Record Visualiser</div>
     <div id="header-subtitle">Witley &amp; Milford Surgery &nbsp;&mdash;&nbsp; Offline Clinical Tool</div>
     <button id="global-search-btn" onclick="openSearch()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:6px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;display:none;" title="Search all records (Ctrl+K)">&#128269; Search</button>
+    <button id="new-patient-btn" onclick="clearPatient()" title="Clear current record and load a new patient">&#8634; New Patient</button>
     <button id="export-btn" onclick="exportSummary()">Export Summary</button>
   </div>
 
@@ -2294,6 +2298,8 @@ function activateApp() {
   if (esb) esb.classList.add('visible');
   var gsb = document.getElementById('global-search-btn');
   if (gsb) gsb.style.display = 'block';
+  var npb = document.getElementById('new-patient-btn');
+  if (npb) npb.style.display = 'block';
   switchTab('dashboard');
 }
 
@@ -3025,6 +3031,46 @@ function exportSummary() {
   } else {
     alert('Pop-up blocked. Please allow pop-ups for this page.');
   }
+}
+
+// ========== CLEAR PATIENT / NEW PATIENT ==========
+function clearPatient() {
+  if (!confirm('Load a new patient? This will clear the current record.')) return;
+  // Destroy all Chart.js instances
+  Object.keys(_state.charts).forEach(function(k) { destroyChart(k); });
+  // Reset state
+  _state.entries = [];
+  _state.demographics = {name:'', dob:'', nhsNumber:'', age:'', title:''};
+  _state.problemsText = '';
+  _state.lettersEntries = undefined;
+  _state.problemFilter = null;
+  _state.charts = {};
+  // Clear rendered containers
+  ['stat-cards','gap-alerts-container','referral-breakdown','velocity-grid','complexity-factors',
+   'inv-list','rx-list','letters-list','cci-grid','med-timeline-svg-container',
+   'chronology-body','search-results-list','timeline-chart-container',
+   'contacts-chart-container','contacts-table-body','clinician-table-body'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.innerHTML = '';
+  });
+  // Hide header buttons
+  document.getElementById('patient-banner').classList.remove('visible');
+  document.getElementById('nav').classList.remove('visible');
+  var esb = document.getElementById('export-btn');
+  if (esb) esb.classList.remove('visible');
+  var gsb = document.getElementById('global-search-btn');
+  if (gsb) gsb.style.display = 'none';
+  var npb = document.getElementById('new-patient-btn');
+  if (npb) npb.style.display = 'none';
+  // Clear file input so same file can be re-dropped
+  var fi = document.getElementById('file-input'); if (fi) fi.value = '';
+  // Close any open overlays
+  closeDetail(); closeSearch();
+  // Hide all tab panes and restore drop zone
+  document.querySelectorAll('.tab-pane').forEach(function(p) {
+    p.classList.remove('active'); p.classList.add('hidden');
+  });
+  var dz = document.getElementById('drop-zone');
+  if (dz) { dz.classList.remove('hidden'); dz.classList.add('active'); }
 }
 
 })();
