@@ -682,7 +682,8 @@ var _state = {
   entries: [],
   demographics: {name:'', dob:'', nhsNumber:'', age:'', title:''},
   problemsText: '',
-  charts: {}
+  charts: {},
+  builtViews: {}
 };
 window._appState = _state;
 
@@ -725,6 +726,10 @@ function escHtml(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// Safe min/max for large arrays — spread operator blows the stack on big records
+function tsMin(arr) { return arr.reduce(function(m,v){ return v<m?v:m; }, arr[0]); }
+function tsMax(arr) { return arr.reduce(function(m,v){ return v>m?v:m; }, arr[0]); }
 
 // ========== PDF PARSING ==========
 async function parsePDF(file) {
@@ -914,6 +919,7 @@ function buildAllViews() {
   buildInvestigationsView();
   buildProblemsView();
   buildLettersView();
+  _state.builtViews.letters = true;
 }
 
 function updateBanner() {
@@ -925,7 +931,7 @@ function updateBanner() {
   document.getElementById('banner-age').textContent = d.age ? d.age + 'y' : '-';
   var dates = e.filter(x => x.date).map(x => x.date.getTime());
   if (dates.length) {
-    var mn = new Date(Math.min(...dates)), mx = new Date(Math.max(...dates));
+    var mn = new Date(tsMin(dates)), mx = new Date(tsMax(dates));
     document.getElementById('banner-period').textContent = formatDate(mn) + ' – ' + formatDate(mx);
   }
   document.getElementById('patient-banner').classList.add('visible');
@@ -938,8 +944,9 @@ function buildDashboard() {
   entries.forEach(e => tc[e.type] = (tc[e.type]||0) + 1);
 
   var dates = entries.filter(e => e.date).map(e => e.date);
-  var minD = dates.length ? new Date(Math.min(...dates.map(d=>d.getTime()))) : null;
-  var maxD = dates.length ? new Date(Math.max(...dates.map(d=>d.getTime()))) : null;
+  var _dts = dates.map(d=>d.getTime());
+  var minD = dates.length ? new Date(tsMin(_dts)) : null;
+  var maxD = dates.length ? new Date(tsMax(_dts)) : null;
 
   var totalConsults = (tc.consultation||0)+(tc.telephone_consultation||0)+(tc.online_consultation||0)+(tc.video_consultation||0)+(tc.home_visit||0);
   var yearsCovered = (minD && maxD) ? (maxD.getFullYear() - minD.getFullYear() + 1) : '-';
@@ -1212,8 +1219,9 @@ function buildTimelineControls() {
 
   var dates = _state.entries.filter(e=>e.date).map(e=>e.date);
   if (dates.length) {
-    var mn = new Date(Math.min(...dates.map(d=>d.getTime())));
-    var mx = new Date(Math.max(...dates.map(d=>d.getTime())));
+    var _dts2 = dates.map(d=>d.getTime());
+    var mn = new Date(tsMin(_dts2));
+    var mx = new Date(tsMax(_dts2));
     document.getElementById('tl-from').value = mn.toISOString().split('T')[0];
     document.getElementById('tl-to').value = mx.toISOString().split('T')[0];
   }
@@ -1268,8 +1276,9 @@ function renderTimeline(entries) {
   var validDates = entries.filter(e=>e.date).map(e=>e.date);
   if (!validDates.length) return;
 
-  var xMin = new Date(Math.min(...validDates.map(d=>d.getTime())));
-  var xMax = new Date(Math.max(...validDates.map(d=>d.getTime())));
+  var _vdts = validDates.map(d=>d.getTime());
+  var xMin = new Date(tsMin(_vdts));
+  var xMax = new Date(tsMax(_vdts));
   var pad = Math.max((xMax-xMin)*0.02, 86400000*7);
   var xScale = d3.scaleTime().domain([new Date(xMin-pad), new Date(+xMax+pad)]).range([0,innerW]);
 
@@ -1424,8 +1433,8 @@ function buildContinuityView() {
 
   // Determine visible date window
   var allTs = entries.map(e => e.date.getTime());
-  var absMax = new Date(Math.max(...allTs));
-  var absMin = new Date(Math.min(...allTs));
+  var absMax = new Date(tsMax(allTs));
+  var absMin = new Date(tsMin(allTs));
   var winMin;
   if (_continuityRange === 0) {
     winMin = new Date(absMin.getFullYear(), absMin.getMonth(), 1);
@@ -2222,19 +2231,11 @@ window.filterPrescriptions = function() {
 };
 
 // ========== ENTRY LIST RENDERER ==========
-function renderEntryList(containerId, entries, countId) {
-  var el = document.getElementById(containerId);
-  if (!el) return;
-  if (countId) {
-    var cel = document.getElementById(countId);
-    if (cel) cel.textContent = entries.length + ' entr' + (entries.length===1?'y':'ies');
-  }
-  var sorted = [...entries].sort((a,b)=>(b.date||new Date(0))-(a.date||new Date(0)));
-  if (!sorted.length) {
-    el.innerHTML = '<p class="text-secondary" style="padding:16px;text-align:center">No entries found.</p>';
-    return;
-  }
-  el.innerHTML = sorted.map(function(e) {
+var _ENTRY_PAGE = 50;
+var _entryListCache = {};
+
+function _renderEntryRows(sorted) {
+  return sorted.map(function(e) {
     var color = TYPE_COLORS[e.type]||'#505a5f';
     var preview = (e.text||'').replace(/\s+/g,' ').substring(0,130);
     var eraLabel = e.era==='medicus' ? '<span style="color:#003d78;font-weight:600">Medicus</span>' : '<span style="color:#6a1a79">EMIS</span>';
@@ -2248,6 +2249,38 @@ function renderEntryList(containerId, entries, countId) {
       +'<div style="font-size:11px;padding-top:2px;white-space:nowrap">'+eraLabel+'</div>'
       +'</div>';
   }).join('');
+}
+
+window._showAllEntries = function(containerId) {
+  var cached = _entryListCache[containerId];
+  if (!cached) return;
+  var el = document.getElementById(containerId);
+  if (el) el.innerHTML = _renderEntryRows(cached.sorted);
+};
+
+function renderEntryList(containerId, entries, countId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (countId) {
+    var cel = document.getElementById(countId);
+    if (cel) cel.textContent = entries.length + ' entr' + (entries.length===1?'y':'ies');
+  }
+  var sorted = [...entries].sort((a,b)=>(b.date||new Date(0))-(a.date||new Date(0)));
+  if (!sorted.length) {
+    el.innerHTML = '<p class="text-secondary" style="padding:16px;text-align:center">No entries found.</p>';
+    return;
+  }
+  if (sorted.length <= _ENTRY_PAGE) {
+    el.innerHTML = _renderEntryRows(sorted);
+    return;
+  }
+  // Paginate: show first _ENTRY_PAGE with a "show all" button
+  _entryListCache[containerId] = { sorted: sorted };
+  el.innerHTML = _renderEntryRows(sorted.slice(0, _ENTRY_PAGE))
+    + '<div style="text-align:center;padding:16px 0 8px">'
+    + '<button onclick="window._showAllEntries(\''+containerId+'\')" '
+    + 'style="padding:8px 20px;background:#f0f4f5;border:1px solid #d0d5d8;border-radius:6px;font-size:13px;cursor:pointer;font-weight:600;color:#005eb8">'
+    + 'Show all ' + sorted.length + ' entries \u2193</button></div>';
 }
 
 // ========== DETAIL PANEL ==========
@@ -2281,11 +2314,11 @@ window.filterByClinician = function(name) {
   // Clear date range
   var dates = _state.entries.filter(e=>e.date).map(e=>e.date.getTime());
   if (dates.length) {
-    document.getElementById('tl-from').value = new Date(Math.min(...dates)).toISOString().split('T')[0];
-    document.getElementById('tl-to').value = new Date(Math.max(...dates)).toISOString().split('T')[0];
+    document.getElementById('tl-from').value = new Date(tsMin(dates)).toISOString().split('T')[0];
+    document.getElementById('tl-to').value = new Date(tsMax(dates)).toISOString().split('T')[0];
   }
   setTimeout(function() {
-    renderTimeline(_state.entries.filter(e=>e.practitioner===name));
+    renderTimeline(_state.entries.filter(e=>normClinician(e.practitioner||'')===name));
   }, 150);
 };
 
@@ -2312,14 +2345,18 @@ function switchTab(name) {
     if (_state.problemFilter) {
       var pn = _state.problemFilter.name.toLowerCase();
       renderTimeline(_state.entries.filter(function(e) {
-        return !e.text || e.text.toLowerCase().indexOf(pn) >= 0;
+        return e.text && e.text.toLowerCase().indexOf(pn) >= 0;
       }));
     } else {
       renderTimeline(_state.entries);
     }
   }, 80);
-  if (name==='continuity') setTimeout(buildContinuityView, 80);
-  if (name==='letters') setTimeout(buildLettersView, 80);
+  if (name==='continuity') setTimeout(function(){
+    if (!_state.builtViews.continuity) { buildContinuityView(); _state.builtViews.continuity = true; }
+  }, 80);
+  if (name==='letters') setTimeout(function(){
+    if (!_state.builtViews.letters) { buildLettersView(); _state.builtViews.letters = true; }
+  }, 80);
 }
 
 // ========== PROGRESS ==========
@@ -3045,6 +3082,7 @@ function clearPatient() {
   _state.lettersEntries = undefined;
   _state.problemFilter = null;
   _state.charts = {};
+  _state.builtViews = {};
   // Clear rendered containers
   ['stat-cards','gap-alerts-container','referral-breakdown','velocity-grid','complexity-factors',
    'inv-list','rx-list','letters-list','cci-grid','med-timeline-svg-container',
