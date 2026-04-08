@@ -6,7 +6,7 @@ A single-file offline clinical tool for visualising Medicus EPR patient record e
 
 ## Download
 
-**[Download visualiser.html](https://github.com/davetriska/medicus-record-visualiser/releases/latest/download/visualiser.html)**
+**[Download visualiser.html](https://github.com/davetriska02-collab/medicus-record-visualiser/releases/latest/download/visualiser.html)**
 
 That's it. One file. ~2MB. No installer, no admin rights, no dependencies.
 
