@@ -655,6 +655,7 @@ const TYPE_COLORS = {
   allergy: '#c71c73',
   medication_review: '#8f72af',
   questionnaire: '#ffb81c',
+  letter: '#00a499',
   attachment: '#768692',
   unknown: '#505a5f'
 };
@@ -673,6 +674,7 @@ const TYPE_LABELS = {
   allergy: 'Allergy',
   medication_review: 'Med Review',
   questionnaire: 'Questionnaire',
+  letter: 'Letter',
   attachment: 'Attachment',
   unknown: 'Other'
 };
@@ -698,6 +700,7 @@ function classifyType(t) {
   if (t.includes('video')) return 'video_consultation';
   if (t.includes('home visit')) return 'home_visit';
   if (t.includes('docman') || t.includes('inbound document') || t.includes('scanned document') || t.includes('externally entered') || t.includes('externally enter')) return 'secondary_care';
+  if (t.includes('letter') || t.includes('correspondence')) return 'letter';
   if (t.includes('referral')) return 'referral';
   if (t.includes('administration') || t === 'communication' || t === 'note' || t.includes('future action') || t.includes('third party')) return 'admin';
   if (t.includes('prescription') || t.includes('medication prescribed')) return 'prescription';
@@ -2758,6 +2761,7 @@ function buildLettersView() {
 
   var letters = (_state.entries || []).filter(function(e) {
     if (e.type === 'letter') return true;
+    if (e.type === 'secondary_care') return true;
     if (e.typeRaw && e.typeRaw.toLowerCase().indexOf('letter') !== -1) return true;
     var text = e.text || '';
     if (text.indexOf('Dear ') === 0) return true;
@@ -2936,7 +2940,7 @@ function closeSearch() {
 }
 function runSearch() {
   var input = document.getElementById('search-input');
-  var resultsEl = document.getElementById('search-results');
+  var resultsEl = document.getElementById('search-results-list');
   var emptyEl = document.getElementById('search-empty');
   if (!input || !resultsEl) return;
   var query = input.value.trim();
@@ -2974,7 +2978,7 @@ function runSearch() {
       + '<div class="sr-preview">' + preview + (rawText.length > 180 ? '...' : '') + '</div>'
       + '</div>';
   }).join('');
-  document.querySelectorAll('#search-results .search-result-item').forEach(function(el) {
+  document.querySelectorAll('#search-results-list .search-result-item').forEach(function(el) {
     el.style.cursor = 'pointer';
     el.addEventListener('click', function() {
       closeSearch();
