@@ -290,7 +290,7 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
       </svg>
     </div>
     <div id="header-title">Medicus Patient Record Visualiser</div>
-    <div id="header-subtitle">Witley &amp; Milford Surgery &nbsp;&mdash;&nbsp; Offline Clinical Tool</div>
+    <div id="header-subtitle">Offline Clinical Tool</div>
     <button id="global-search-btn" onclick="openSearch()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:6px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;display:none;" title="Search all records (Ctrl+K)">&#128269; Search</button>
     <button id="new-patient-btn" onclick="clearPatient()" title="Clear current record and load a new patient">&#8634; New Patient</button>
     <button id="export-btn" onclick="exportSummary()">Export Summary</button>
@@ -694,7 +694,7 @@ function classifyType(t) {
   t = t.toLowerCase().trim();
   // Medicus appends " consultation" to many types — strip it
   t = t.replace(/\s+consultation$/, '');
-  if (t.includes('face to face') || t === 'consultation' || t.includes('gp surgery') || t.includes('g.p.surgery') || t.includes('witley surgery')) return 'consultation';
+  if (t.includes('face to face') || t === 'consultation' || t.includes('gp surgery') || t.includes('g.p.surgery') || t.includes('surgery consultation')) return 'consultation';
   if (t.includes('telephone')) return 'telephone_consultation';
   if (t.includes('accurx') || t === 'online' || t.includes('online communication')) return 'online_consultation';
   if (t.includes('video')) return 'video_consultation';
@@ -3061,7 +3061,7 @@ function exportSummary() {
           + '<td>' + escHtml((e.text || '').substring(0, 120).replace(/\n/g, ' ')) + '\u2026</td></tr>';
       }).join('')
     + '</tbody></table>'
-    + '<div class="footer">Generated ' + new Date().toLocaleString('en-GB') + ' &bull; Witley &amp; Milford Surgery &bull; Offline Clinical Tool &bull; Not for external sharing</div>'
+    + '<div class="footer">Generated ' + new Date().toLocaleString('en-GB') + ' &bull; Offline Clinical Tool &bull; Not for external sharing</div>'
     + '</body></html>';
 
   var win = window.open('', '_blank');
