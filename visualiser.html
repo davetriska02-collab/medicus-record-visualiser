@@ -3638,6 +3638,24 @@ function removeComparison() {
   switchTab('dashboard');
 }
 
+// Expose functions to window for inline onclick handlers
+window.openSearch = openSearch;
+window.closeSearch = closeSearch;
+window.runSearch = runSearch;
+window.clearPatient = clearPatient;
+window.exportSummary = exportSummary;
+window.exportToClipboard = exportToClipboard;
+window.toggleToolbarPin = toggleToolbarPin;
+window.startComparison = startComparison;
+window.cancelComparison = cancelComparison;
+window.removeComparison = removeComparison;
+window.handleCompareDrop = handleCompareDrop;
+window.handleCompareFile = handleCompareFile;
+window.clearProblemFilter = clearProblemFilter;
+window.toggleChronology = toggleChronology;
+window.filterLetters = filterLetters;
+window.destroyChart = destroyChart;
+
 })();
 </script>
 </body>
