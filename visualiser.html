@@ -277,6 +277,47 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
 /* ========== NEW PATIENT BUTTON ========== */
 #new-patient-btn { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.5); padding: 6px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; display: none; transition: background var(--transition); }
 #new-patient-btn:hover { background: rgba(212,53,28,0.5); border-color: #d4351c; }
+/* ========== FLOATING TOOLBAR ========== */
+#floating-toolbar { position: fixed; bottom: 20px; right: 20px; z-index: 9000; background: white; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid var(--border); padding: 8px 12px; display: flex; align-items: center; gap: 8px; transition: all var(--transition); }
+#floating-toolbar.toolbar-minimised #toolbar-actions { display: none; }
+#floating-toolbar.toolbar-minimised .toolbar-label { display: none; }
+#toolbar-handle { cursor: pointer; display: flex; align-items: center; gap: 4px; user-select: none; }
+#toolbar-pin { background: none; border: none; font-size: 16px; cursor: pointer; padding: 2px 4px; line-height: 1; opacity: 0.6; transition: opacity var(--transition); }
+#toolbar-pin:hover { opacity: 1; }
+.toolbar-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+#toolbar-actions { display: flex; gap: 6px; }
+#toolbar-actions button { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all var(--transition); color: var(--text); }
+#toolbar-actions button:hover { background: var(--nhs-blue-light); color: var(--nhs-blue); }
+#toolbar-toast { position: absolute; top: -36px; right: 0; background: #007f3b; color: white; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+#toolbar-toast.show { opacity: 1; }
+/* ========== CHART EXPORT BUTTONS ========== */
+.chart-card { position: relative; }
+.chart-export-btn { position: absolute; top: 8px; right: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-secondary); opacity: 0; transition: opacity 0.2s; z-index: 5; }
+.chart-card:hover .chart-export-btn { opacity: 0.6; }
+.chart-export-btn:hover { opacity: 1 !important; background: var(--nhs-blue-light); color: var(--nhs-blue); }
+/* ========== PATIENT COMPARISON ========== */
+#tab-compare .compare-banner { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-bottom: 24px; }
+#tab-compare .compare-patient { background: white; border-radius: var(--radius); padding: 14px 18px; box-shadow: var(--shadow); }
+#tab-compare .compare-patient .cp-name { font-size: 16px; font-weight: 700; color: var(--text); }
+#tab-compare .compare-patient .cp-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+#tab-compare .compare-vs { font-size: 20px; font-weight: 700; color: var(--text-secondary); text-align: center; }
+#tab-compare .compare-table { width: 100%; border-collapse: collapse; background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 24px; }
+#tab-compare .compare-table th { background: var(--nhs-blue); color: white; padding: 10px 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; text-align: left; }
+#tab-compare .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+#tab-compare .compare-table tr:last-child td { border-bottom: none; }
+#tab-compare .compare-table td.metric-label { font-weight: 600; color: var(--text-secondary); width: 200px; }
+#tab-compare .compare-table td.higher-concern { background: #fce4ec; }
+#tab-compare .compare-table td.higher-favourable { background: #e8f5e9; }
+#compare-drop-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9500; align-items: center; justify-content: center; }
+#compare-drop-overlay.visible { display: flex; }
+#compare-drop-box { background: white; border-radius: 12px; padding: 48px; text-align: center; box-shadow: var(--shadow-md); max-width: 480px; }
+#compare-drop-box h2 { font-size: 18px; color: var(--nhs-blue); margin-bottom: 8px; }
+#compare-drop-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+#compare-drop-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px 20px; cursor: pointer; transition: all var(--transition); }
+#compare-drop-zone:hover, #compare-drop-zone.drag-over { border-color: var(--nhs-blue); background: var(--nhs-blue-light); }
+#compare-drop-zone p { font-size: 14px; color: var(--text); font-weight: 600; }
+#compare-cancel { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 20px; margin-top: 16px; cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+#compare-cancel:hover { background: var(--bg); }
 </style>
 </head>
 <body>
@@ -290,7 +331,7 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
       </svg>
     </div>
     <div id="header-title">Medicus Patient Record Visualiser</div>
-    <div id="header-subtitle">Witley &amp; Milford Surgery &nbsp;&mdash;&nbsp; Offline Clinical Tool</div>
+    <div id="header-subtitle">Offline Clinical Tool</div>
     <button id="global-search-btn" onclick="openSearch()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:6px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;display:none;" title="Search all records (Ctrl+K)">&#128269; Search</button>
     <button id="new-patient-btn" onclick="clearPatient()" title="Clear current record and load a new patient">&#8634; New Patient</button>
     <button id="export-btn" onclick="exportSummary()">Export Summary</button>
@@ -313,6 +354,7 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
     <button class="nav-tab" data-tab="investigations">Investigations</button>
     <button class="nav-tab" data-tab="problems">Problems &amp; Medications</button>
     <button class="nav-tab" data-tab="letters">Letters &amp; Correspondence</button>
+    <button class="nav-tab" data-tab="compare" id="compare-tab" style="display:none">Patient Comparison</button>
   </div>
 
   <div id="main">
@@ -527,6 +569,17 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
       </div>
     </div>
 
+    <!-- COMPARE -->
+    <div id="tab-compare" class="tab-pane hidden">
+      <div class="compare-banner" id="compare-banner"></div>
+      <table class="compare-table" id="compare-table"></table>
+      <div class="section-row">
+        <div class="chart-card"><h3>Yearly Contact Rates</h3><div class="chart-container" style="height:250px"><canvas id="chart-compare-yearly"></canvas></div></div>
+        <div class="chart-card"><h3>Entry Type Distribution</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center"><div class="chart-container" style="height:220px"><canvas id="chart-compare-donut-a"></canvas></div><div class="chart-container" style="height:220px"><canvas id="chart-compare-donut-b"></canvas></div></div></div>
+      </div>
+      <div style="text-align:center;margin-top:16px"><button id="remove-compare-btn" onclick="removeComparison()" style="background:none;border:1px solid var(--border);border-radius:var(--radius);padding:8px 20px;cursor:pointer;font-size:13px;color:var(--text-secondary)">Remove Comparison</button></div>
+    </div>
+
   </div><!-- #main -->
 </div><!-- #app -->
 
@@ -540,6 +593,34 @@ html, body { height: 100%; font-family: "Frutiger", "Helvetica Neue", Arial, san
     <div id="search-results-list"></div>
     <div id="search-empty" style="display:none">No results found.</div>
     <div id="search-shortcut">Tip: Press Ctrl+K to open search, Esc to close</div>
+  </div>
+</div>
+
+<!-- FLOATING TOOLBAR -->
+<div id="floating-toolbar" style="display:none">
+  <div id="toolbar-handle" onclick="toggleToolbarPin()">
+    <button id="toolbar-pin" title="Pin/unpin toolbar">&#128204;</button>
+    <span class="toolbar-label">Tools</span>
+  </div>
+  <div id="toolbar-actions">
+    <button onclick="exportToClipboard()" title="Copy summary to clipboard">&#128203; Copy Summary</button>
+    <button onclick="openSearch()" title="Search records (Ctrl+K)">&#128269; Search</button>
+    <button id="toolbar-compare-btn" onclick="startComparison()" style="display:none" title="Compare with another patient">&#8644; Compare</button>
+    <button onclick="clearPatient()" title="Load new patient">&#8634; New Patient</button>
+  </div>
+  <div id="toolbar-toast">Copied to clipboard!</div>
+</div>
+
+<!-- COMPARE DROP OVERLAY -->
+<div id="compare-drop-overlay" onclick="if(event.target===this)cancelComparison()">
+  <div id="compare-drop-box">
+    <h2>Load Second Patient</h2>
+    <p>Drop a Medicus PDF here to compare with the current patient</p>
+    <div id="compare-drop-zone" onclick="document.getElementById('compare-file-input').click()" ondrop="handleCompareDrop(event)" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')">
+      <p>Drop PDF here or click to browse</p>
+      <input type="file" id="compare-file-input" accept=".pdf" style="display:none" onchange="handleCompareFile(this)">
+    </div>
+    <button id="compare-cancel" onclick="cancelComparison()">Cancel</button>
   </div>
 </div>
 
@@ -655,6 +736,7 @@ const TYPE_COLORS = {
   allergy: '#c71c73',
   medication_review: '#8f72af',
   questionnaire: '#ffb81c',
+  letter: '#00a499',
   attachment: '#768692',
   unknown: '#505a5f'
 };
@@ -673,6 +755,7 @@ const TYPE_LABELS = {
   allergy: 'Allergy',
   medication_review: 'Med Review',
   questionnaire: 'Questionnaire',
+  letter: 'Letter',
   attachment: 'Attachment',
   unknown: 'Other'
 };
@@ -686,18 +769,22 @@ var _state = {
   builtViews: {}
 };
 window._appState = _state;
+var _patients = [];
+var _compareMode = false;
+var _toolbarPinned = true;
 
 // ========== TYPE CLASSIFIER ==========
 function classifyType(t) {
   t = t.toLowerCase().trim();
   // Medicus appends " consultation" to many types — strip it
   t = t.replace(/\s+consultation$/, '');
-  if (t.includes('face to face') || t === 'consultation' || t.includes('gp surgery') || t.includes('g.p.surgery') || t.includes('witley surgery')) return 'consultation';
+  if (t.includes('face to face') || t === 'consultation' || t.includes('gp surgery') || t.includes('g.p.surgery') || t.includes('surgery consultation')) return 'consultation';
   if (t.includes('telephone')) return 'telephone_consultation';
   if (t.includes('accurx') || t === 'online' || t.includes('online communication')) return 'online_consultation';
   if (t.includes('video')) return 'video_consultation';
   if (t.includes('home visit')) return 'home_visit';
   if (t.includes('docman') || t.includes('inbound document') || t.includes('scanned document') || t.includes('externally entered') || t.includes('externally enter')) return 'secondary_care';
+  if (t.includes('letter') || t.includes('correspondence')) return 'letter';
   if (t.includes('referral')) return 'referral';
   if (t.includes('administration') || t === 'communication' || t === 'note' || t.includes('future action') || t.includes('third party')) return 'admin';
   if (t.includes('prescription') || t.includes('medication prescribed')) return 'prescription';
@@ -2333,7 +2420,12 @@ function activateApp() {
   if (gsb) gsb.style.display = 'block';
   var npb = document.getElementById('new-patient-btn');
   if (npb) npb.style.display = 'block';
+  var ft = document.getElementById('floating-toolbar');
+  if (ft) ft.style.display = 'flex';
+  var tcb = document.getElementById('toolbar-compare-btn');
+  if (tcb) tcb.style.display = 'inline-block';
   switchTab('dashboard');
+  setTimeout(injectExportButtons, 200);
 }
 
 function switchTab(name) {
@@ -2357,6 +2449,10 @@ function switchTab(name) {
   if (name==='letters') setTimeout(function(){
     if (!_state.builtViews.letters) { buildLettersView(); _state.builtViews.letters = true; }
   }, 80);
+  if (name==='compare') setTimeout(function(){
+    if (_patients.length === 2) buildComparisonView();
+  }, 80);
+  setTimeout(injectExportButtons, 200);
 }
 
 // ========== PROGRESS ==========
@@ -2758,6 +2854,7 @@ function buildLettersView() {
 
   var letters = (_state.entries || []).filter(function(e) {
     if (e.type === 'letter') return true;
+    if (e.type === 'secondary_care') return true;
     if (e.typeRaw && e.typeRaw.toLowerCase().indexOf('letter') !== -1) return true;
     var text = e.text || '';
     if (text.indexOf('Dear ') === 0) return true;
@@ -2936,7 +3033,7 @@ function closeSearch() {
 }
 function runSearch() {
   var input = document.getElementById('search-input');
-  var resultsEl = document.getElementById('search-results');
+  var resultsEl = document.getElementById('search-results-list');
   var emptyEl = document.getElementById('search-empty');
   if (!input || !resultsEl) return;
   var query = input.value.trim();
@@ -2974,7 +3071,7 @@ function runSearch() {
       + '<div class="sr-preview">' + preview + (rawText.length > 180 ? '...' : '') + '</div>'
       + '</div>';
   }).join('');
-  document.querySelectorAll('#search-results .search-result-item').forEach(function(el) {
+  document.querySelectorAll('#search-results-list .search-result-item').forEach(function(el) {
     el.style.cursor = 'pointer';
     el.addEventListener('click', function() {
       closeSearch();
@@ -3057,7 +3154,7 @@ function exportSummary() {
           + '<td>' + escHtml((e.text || '').substring(0, 120).replace(/\n/g, ' ')) + '\u2026</td></tr>';
       }).join('')
     + '</tbody></table>'
-    + '<div class="footer">Generated ' + new Date().toLocaleString('en-GB') + ' &bull; Witley &amp; Milford Surgery &bull; Offline Clinical Tool &bull; Not for external sharing</div>'
+    + '<div class="footer">Generated ' + new Date().toLocaleString('en-GB') + ' &bull; Offline Clinical Tool &bull; Not for external sharing</div>'
     + '</body></html>';
 
   var win = window.open('', '_blank');
@@ -3103,6 +3200,16 @@ function clearPatient() {
   var fi = document.getElementById('file-input'); if (fi) fi.value = '';
   // Close any open overlays
   closeDetail(); closeSearch();
+  // Clear comparison state
+  _patients = [];
+  _compareMode = false;
+  var ct = document.getElementById('compare-tab'); if (ct) ct.style.display = 'none';
+  var ft = document.getElementById('floating-toolbar'); if (ft) ft.style.display = 'none';
+  var tcb = document.getElementById('toolbar-compare-btn'); if (tcb) tcb.style.display = 'none';
+  ['compare-banner','compare-table'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.innerHTML = '';
+  });
+  destroyChart('compare-yearly'); destroyChart('compare-donut-a'); destroyChart('compare-donut-b');
   // Hide all tab panes and restore drop zone
   document.querySelectorAll('.tab-pane').forEach(function(p) {
     p.classList.remove('active'); p.classList.add('hidden');
@@ -3110,6 +3217,444 @@ function clearPatient() {
   var dz = document.getElementById('drop-zone');
   if (dz) { dz.classList.remove('hidden'); dz.classList.add('active'); }
 }
+
+// ========== FLOATING TOOLBAR ==========
+function toggleToolbarPin() {
+  _toolbarPinned = !_toolbarPinned;
+  var ft = document.getElementById('floating-toolbar');
+  if (ft) ft.classList.toggle('toolbar-minimised', !_toolbarPinned);
+}
+
+function showToolbarToast(msg) {
+  var toast = document.getElementById('toolbar-toast');
+  if (!toast) return;
+  toast.textContent = msg || 'Copied to clipboard!';
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 2000);
+}
+
+function exportToClipboard() {
+  if (!_state.entries || !_state.entries.length) {
+    alert('No patient record loaded.');
+    return;
+  }
+  var d = _state.demographics;
+  var entries = _state.entries;
+  var tc = {};
+  entries.forEach(function(e) { tc[e.type] = (tc[e.type] || 0) + 1; });
+  var dates = entries.filter(function(e) { return e.date; }).map(function(e) { return e.date; });
+  var minD = dates.length ? new Date(Math.min.apply(null, dates.map(function(x) { return x.getTime(); }))) : null;
+  var maxD = dates.length ? new Date(Math.max.apply(null, dates.map(function(x) { return x.getTime(); }))) : null;
+  var consults = (tc.consultation||0)+(tc.telephone_consultation||0)+(tc.online_consultation||0)+(tc.video_consultation||0)+(tc.home_visit||0);
+
+  var clinCounts = {};
+  entries.forEach(function(e) { if (e.practitioner) clinCounts[e.practitioner] = (clinCounts[e.practitioner]||0)+1; });
+  var topClins = Object.keys(clinCounts).sort(function(a,b){ return clinCounts[b]-clinCounts[a]; }).slice(0,5);
+
+  var recent = entries.filter(function(e) { return e.date; }).sort(function(a,b){ return b.date-a.date; }).slice(0,10);
+
+  var lines = [];
+  lines.push('PATIENT RECORD SUMMARY');
+  lines.push('======================');
+  lines.push('Patient: ' + (d.name || 'Unknown'));
+  lines.push('DOB: ' + (d.dob || '-') + ' | Age: ' + (d.age ? d.age + 'y' : '-') + ' | NHS: ' + (d.nhsNumber || '-'));
+  if (minD && maxD) lines.push('Record: ' + formatDate(minD) + ' \u2013 ' + formatDate(maxD));
+  lines.push('');
+  lines.push('RECORD OVERVIEW');
+  lines.push('Total Entries: ' + entries.length);
+  lines.push('Consultations: ' + consults + ' | Prescriptions: ' + (tc.prescription||0) + ' | Investigations: ' + (tc.lab_result||0));
+  lines.push('Referrals: ' + (tc.referral||0) + ' | Letters: ' + (tc.letter||0) + ((tc.secondary_care||0) ? ' + ' + tc.secondary_care + ' secondary care' : ''));
+  lines.push('');
+  lines.push('TOP CLINICIANS');
+  topClins.forEach(function(c) { lines.push(c + ' - ' + clinCounts[c] + ' contacts'); });
+  lines.push('');
+  lines.push('10 MOST RECENT ENTRIES');
+  recent.forEach(function(e) {
+    var summary = (e.text||'').replace(/\s+/g,' ').trim().substring(0,100);
+    lines.push(formatDate(e.date) + ' | ' + (e.typeRaw||e.type) + ' | ' + (e.practitioner||'-') + ' | ' + summary);
+  });
+  lines.push('');
+  lines.push('Generated ' + new Date().toLocaleString('en-GB') + ' | Offline Clinical Tool | Not for external sharing');
+
+  var text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(function() {
+    showToolbarToast('Copied to clipboard!');
+  }).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToolbarToast('Copied to clipboard!');
+  });
+}
+
+// ========== PNG EXPORT ==========
+var EXPORTABLE_VISUALS = [
+  {id:'chart-yearly', name:'contacts-per-year', type:'chartjs'},
+  {id:'chart-donut', name:'entry-type-breakdown', type:'chartjs'},
+  {id:'chart-contacts-stacked', name:'contacts-stacked', type:'chartjs'},
+  {id:'chart-inv-yearly', name:'investigations-yearly', type:'chartjs'},
+  {id:'chart-problems-yearly', name:'problems-yearly', type:'chartjs'},
+  {id:'chart-letters-yearly', name:'letters-yearly', type:'chartjs'},
+  {id:'chart-ref-yearly', name:'referrals-yearly', type:'chartjs'},
+  {container:'timeline-chart-container', name:'timeline', type:'svg'},
+  {container:'contacts-chart-container', name:'continuity-heatmap', type:'svg'},
+  {container:'med-timeline-svg-container', name:'medication-timeline', type:'svg'}
+];
+
+function svgToPng(svgElement, filename, scale) {
+  scale = scale || 2;
+  var clone = svgElement.cloneNode(true);
+  var styleEl = document.createElementNS('http://www.w3.org/2000/svg','style');
+  styleEl.textContent = 'text { font-family: Arial, Helvetica, sans-serif; }';
+  clone.insertBefore(styleEl, clone.firstChild);
+  var bbox = svgElement.getBBox();
+  var vw = parseFloat(svgElement.getAttribute('width')) || bbox.width + bbox.x;
+  var vh = parseFloat(svgElement.getAttribute('height')) || bbox.height + bbox.y;
+  if (!clone.getAttribute('viewBox')) clone.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
+  clone.setAttribute('width', vw);
+  clone.setAttribute('height', vh);
+  var svgData = new XMLSerializer().serializeToString(clone);
+  var canvas = document.createElement('canvas');
+  canvas.width = vw * scale;
+  canvas.height = vh * scale;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  var img = new Image();
+  var blob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  img.onload = function() {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, vw, vh);
+    URL.revokeObjectURL(url);
+    var a = document.createElement('a');
+    a.download = filename + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  img.src = url;
+}
+
+function exportVisual(v) {
+  var patientName = (_state.demographics.name || 'patient').replace(/\s+/g,'-').toLowerCase();
+  var filename = patientName + '-' + v.name;
+  if (v.type === 'chartjs') {
+    var canvas = document.getElementById(v.id);
+    if (!canvas) return;
+    var a = document.createElement('a');
+    a.download = filename + '.png';
+    a.href = canvas.toDataURL('image/png', 1.0);
+    a.click();
+  } else if (v.type === 'svg') {
+    var container = document.getElementById(v.container);
+    var svgEl = container ? container.querySelector('svg') : null;
+    if (!svgEl) return;
+    svgToPng(svgEl, filename, 2);
+  }
+}
+
+function injectExportButtons() {
+  EXPORTABLE_VISUALS.forEach(function(v) {
+    var target;
+    if (v.type === 'chartjs') {
+      target = document.getElementById(v.id);
+      if (!target) return;
+      target = target.closest('.chart-card');
+    } else {
+      target = document.getElementById(v.container);
+      if (!target) return;
+      target = target.closest('.chart-card') || target;
+    }
+    if (!target || target.querySelector('.chart-export-btn')) return;
+    var btn = document.createElement('button');
+    btn.className = 'chart-export-btn';
+    btn.innerHTML = '&#8681; PNG';
+    btn.title = 'Export as PNG';
+    btn.onclick = function(e) { e.stopPropagation(); exportVisual(v); };
+    target.appendChild(btn);
+  });
+}
+
+// ========== PATIENT COMPARISON ==========
+function computeTypeCounts(entries) {
+  var tc = {};
+  entries.forEach(function(e) { tc[e.type] = (tc[e.type]||0)+1; });
+  tc._consults = (tc.consultation||0)+(tc.telephone_consultation||0)+(tc.online_consultation||0)+(tc.video_consultation||0)+(tc.home_visit||0);
+  return tc;
+}
+
+function computeYearlyContacts(entries) {
+  var yc = {};
+  entries.forEach(function(e) { if (e.date) { var y = e.date.getFullYear(); yc[y] = (yc[y]||0)+1; } });
+  return yc;
+}
+
+function computeComplexityScore(entries) {
+  var tc = computeTypeCounts(entries);
+  var consults = tc._consults;
+  var clinicians = {};
+  entries.forEach(function(e) { if (e.practitioner) clinicians[e.practitioner] = true; });
+  var dates = entries.filter(function(e){return e.date;}).map(function(e){return e.date;});
+  var years = 0;
+  if (dates.length >= 2) {
+    var min = Math.min.apply(null, dates.map(function(d){return d.getTime();}));
+    var max = Math.max.apply(null, dates.map(function(d){return d.getTime();}));
+    years = (max - min) / (365.25*86400000);
+  }
+  var raw = Math.min(consults/5, 10) + Math.min((tc.prescription||0)/10, 10) + Math.min((tc.referral||0)/2, 10) + Math.min((tc.lab_result||0)/5, 10) + Math.min(Object.keys(clinicians).length, 5) + Math.min(years/2, 5);
+  var score = Math.round(raw / 50 * 100);
+  var band = score >= 66 ? 'High' : score >= 33 ? 'Moderate' : 'Low';
+  return {score: score, band: band};
+}
+
+function computeContinuityIndex(entries) {
+  var consults = entries.filter(function(e) {
+    return e.type==='consultation'||e.type==='telephone_consultation'||e.type==='online_consultation'||e.type==='video_consultation'||e.type==='home_visit';
+  }).filter(function(e) { return e.practitioner; });
+  var clinCounts = {};
+  consults.forEach(function(e) { clinCounts[e.practitioner] = (clinCounts[e.practitioner]||0)+1; });
+  var sorted = Object.keys(clinCounts).sort(function(a,b){return clinCounts[b]-clinCounts[a];});
+  var topName = sorted[0] || '-';
+  var topCount = clinCounts[topName] || 0;
+  var upc = consults.length ? Math.round(topCount / consults.length * 100) : 0;
+  var samePairs = 0;
+  for (var i = 1; i < consults.length; i++) { if (consults[i].practitioner === consults[i-1].practitioner) samePairs++; }
+  var cpci = consults.length > 1 ? Math.round(samePairs / (consults.length - 1) * 100) : 0;
+  return {upc: upc, cpci: cpci, distinctClinicians: sorted.length, topClinician: topName, topCount: topCount};
+}
+
+function computeAttendanceVelocity(entries) {
+  var consults = entries.filter(function(e) {
+    return e.date && (e.type==='consultation'||e.type==='telephone_consultation'||e.type==='online_consultation'||e.type==='video_consultation'||e.type==='home_visit');
+  }).sort(function(a,b){return a.date-b.date;});
+  if (consults.length < 6) return {early:0, mid:0, recent:0, trend:'Insufficient data'};
+  var third = Math.floor(consults.length / 3);
+  function annualRate(subset) {
+    if (subset.length < 2) return 0;
+    var span = (subset[subset.length-1].date - subset[0].date) / (365.25*86400000);
+    return span > 0 ? Math.round(subset.length / span * 10) / 10 : 0;
+  }
+  var early = annualRate(consults.slice(0, third));
+  var mid = annualRate(consults.slice(third, third*2));
+  var recent = annualRate(consults.slice(third*2));
+  var trend = recent > mid * 1.2 ? 'Accelerating' : recent < mid * 0.8 ? 'Decelerating' : 'Steady';
+  return {early: early, mid: mid, recent: recent, trend: trend};
+}
+
+function computeGapsInCare(entries) {
+  var consults = entries.filter(function(e) {
+    return e.date && (e.type==='consultation'||e.type==='telephone_consultation'||e.type==='online_consultation'||e.type==='video_consultation'||e.type==='home_visit');
+  }).sort(function(a,b){return a.date-b.date;});
+  var gaps = [];
+  for (var i = 1; i < consults.length; i++) {
+    var days = Math.round((consults[i].date - consults[i-1].date) / 86400000);
+    if (days > 90) gaps.push(days);
+  }
+  var longest = gaps.length ? Math.max.apply(null, gaps) : 0;
+  return {count: gaps.length, longestDays: longest};
+}
+
+function computePatientData(entries) {
+  return {
+    typeCounts: computeTypeCounts(entries),
+    yearlyContacts: computeYearlyContacts(entries),
+    complexity: computeComplexityScore(entries),
+    continuity: computeContinuityIndex(entries),
+    velocity: computeAttendanceVelocity(entries),
+    gaps: computeGapsInCare(entries)
+  };
+}
+
+function startComparison() {
+  if (!_state.entries || !_state.entries.length) {
+    alert('Load a patient first.');
+    return;
+  }
+  var overlay = document.getElementById('compare-drop-overlay');
+  if (overlay) overlay.classList.add('visible');
+}
+
+function cancelComparison() {
+  var overlay = document.getElementById('compare-drop-overlay');
+  if (overlay) overlay.classList.remove('visible');
+}
+
+function handleCompareDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('compare-drop-zone').classList.remove('drag-over');
+  var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') loadComparePatient(file);
+}
+
+function handleCompareFile(input) {
+  if (input.files && input.files[0]) loadComparePatient(input.files[0]);
+}
+
+async function loadComparePatient(file) {
+  cancelComparison();
+  showProgress(true);
+  setProgress(2, 'Loading comparison PDF...');
+  try {
+    var ab = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({data:ab}).promise;
+    var total = pdf.numPages;
+    var pageTexts = [];
+    for (var i = 1; i <= total; i++) {
+      setProgress(5 + (i/total)*55, 'Extracting text: page ' + i + ' of ' + total, i, total);
+      var page = await pdf.getPage(i);
+      var tc = await page.getTextContent();
+      var lines = reconstructLines(tc.items);
+      pageTexts.push(lines);
+      if (i % 5 === 0) await new Promise(function(r){setTimeout(r,0);});
+    }
+    setProgress(65, 'Building entries...');
+    var result = buildEntries(pageTexts);
+
+    if (_patients.length === 0) {
+      _patients.push({entries: _state.entries, demographics: _state.demographics, problemsText: _state.problemsText, computed: computePatientData(_state.entries)});
+    }
+    if (_patients.length >= 2) _patients.pop();
+    _patients.push({entries: result.entries, demographics: result.demographics, problemsText: result.problemsText, computed: computePatientData(result.entries)});
+
+    _compareMode = true;
+    setProgress(90, 'Building comparison...');
+    var ct = document.getElementById('compare-tab');
+    if (ct) ct.style.display = 'inline-block';
+    showProgress(false);
+    switchTab('compare');
+  } catch(err) {
+    showProgress(false);
+    alert('Error loading comparison PDF: ' + err.message);
+  }
+}
+
+function buildComparisonView() {
+  if (_patients.length < 2) return;
+  var pa = _patients[0], pb = _patients[1];
+  if (!pa.computed) pa.computed = computePatientData(pa.entries);
+  if (!pb.computed) pb.computed = computePatientData(pb.entries);
+
+  var banner = document.getElementById('compare-banner');
+  if (banner) {
+    banner.innerHTML = '<div class="compare-patient"><div class="cp-name">' + escHtml(pa.demographics.name||'Patient A') + '</div>'
+      + '<div class="cp-detail">DOB: ' + escHtml(pa.demographics.dob||'-') + ' | Age: ' + escHtml(pa.demographics.age ? pa.demographics.age+'y' : '-') + '</div></div>'
+      + '<div class="compare-vs">vs</div>'
+      + '<div class="compare-patient"><div class="cp-name">' + escHtml(pb.demographics.name||'Patient B') + '</div>'
+      + '<div class="cp-detail">DOB: ' + escHtml(pb.demographics.dob||'-') + ' | Age: ' + escHtml(pb.demographics.age ? pb.demographics.age+'y' : '-') + '</div></div>';
+  }
+
+  var tca = pa.computed.typeCounts, tcb = pb.computed.typeCounts;
+
+  function diffClass(a, b, higherIsConcern) {
+    if (a === b || typeof a !== 'number' || typeof b !== 'number') return '';
+    var ratio = Math.max(a,b) / (Math.min(a,b)||1);
+    if (ratio < 1.5) return '';
+    if (higherIsConcern) return a > b ? 'higher-concern' : 'higher-favourable';
+    return a > b ? 'higher-favourable' : 'higher-concern';
+  }
+
+  var rows = [
+    {label:'Complexity Score', a: pa.computed.complexity.score + ' (' + pa.computed.complexity.band + ')', b: pb.computed.complexity.score + ' (' + pb.computed.complexity.band + ')', an: pa.computed.complexity.score, bn: pb.computed.complexity.score, concern: true},
+    {label:'Total Entries', a: pa.entries.length, b: pb.entries.length, an: pa.entries.length, bn: pb.entries.length, concern: true},
+    {label:'Consultations', a: tca._consults, b: tcb._consults, an: tca._consults, bn: tcb._consults, concern: true},
+    {label:'Prescriptions', a: tca.prescription||0, b: tcb.prescription||0, an: tca.prescription||0, bn: tcb.prescription||0, concern: true},
+    {label:'Referrals', a: tca.referral||0, b: tcb.referral||0, an: tca.referral||0, bn: tcb.referral||0, concern: true},
+    {label:'Investigations', a: tca.lab_result||0, b: tcb.lab_result||0, an: tca.lab_result||0, bn: tcb.lab_result||0, concern: true},
+    {label:'Letters / Corresp.', a: (tca.letter||0)+(tca.secondary_care||0), b: (tcb.letter||0)+(tcb.secondary_care||0), an: (tca.letter||0)+(tca.secondary_care||0), bn: (tcb.letter||0)+(tcb.secondary_care||0), concern: true},
+    {label:'UPC Index', a: pa.computed.continuity.upc + '%', b: pb.computed.continuity.upc + '%', an: pa.computed.continuity.upc, bn: pb.computed.continuity.upc, concern: false},
+    {label:'CPCI', a: pa.computed.continuity.cpci + '%', b: pb.computed.continuity.cpci + '%', an: pa.computed.continuity.cpci, bn: pb.computed.continuity.cpci, concern: false},
+    {label:'Distinct Clinicians', a: pa.computed.continuity.distinctClinicians, b: pb.computed.continuity.distinctClinicians, an: pa.computed.continuity.distinctClinicians, bn: pb.computed.continuity.distinctClinicians, concern: true},
+    {label:'Recent Attendance Rate', a: pa.computed.velocity.recent + '/yr', b: pb.computed.velocity.recent + '/yr', an: pa.computed.velocity.recent, bn: pb.computed.velocity.recent, concern: true},
+    {label:'Attendance Trend', a: pa.computed.velocity.trend, b: pb.computed.velocity.trend},
+    {label:'Gaps in Care (>90d)', a: pa.computed.gaps.count, b: pb.computed.gaps.count, an: pa.computed.gaps.count, bn: pb.computed.gaps.count, concern: true},
+    {label:'Longest Gap (days)', a: pa.computed.gaps.longestDays, b: pb.computed.gaps.longestDays, an: pa.computed.gaps.longestDays, bn: pb.computed.gaps.longestDays, concern: true}
+  ];
+
+  var nameA = escHtml(pa.demographics.name||'Patient A');
+  var nameB = escHtml(pb.demographics.name||'Patient B');
+  var tableEl = document.getElementById('compare-table');
+  if (tableEl) {
+    tableEl.innerHTML = '<thead><tr><th>Metric</th><th>' + nameA + '</th><th>' + nameB + '</th></tr></thead><tbody>'
+      + rows.map(function(r) {
+        var ca = r.an !== undefined ? diffClass(r.an, r.bn, r.concern) : '';
+        var cb = r.bn !== undefined ? diffClass(r.bn, r.an, r.concern) : '';
+        return '<tr><td class="metric-label">' + escHtml(r.label) + '</td><td class="' + ca + '">' + escHtml(String(r.a)) + '</td><td class="' + cb + '">' + escHtml(String(r.b)) + '</td></tr>';
+      }).join('') + '</tbody>';
+  }
+
+  // Yearly contacts overlay chart
+  destroyChart('compare-yearly');
+  var ycA = pa.computed.yearlyContacts, ycB = pb.computed.yearlyContacts;
+  var allYears = {};
+  Object.keys(ycA).forEach(function(y){allYears[y]=true;});
+  Object.keys(ycB).forEach(function(y){allYears[y]=true;});
+  var years = Object.keys(allYears).sort();
+  var canvasYearly = document.getElementById('chart-compare-yearly');
+  if (canvasYearly && years.length) {
+    _state.charts['compare-yearly'] = new Chart(canvasYearly.getContext('2d'), {
+      type:'line',
+      data:{
+        labels:years,
+        datasets:[
+          {label:pa.demographics.name||'Patient A', data:years.map(function(y){return ycA[y]||0;}), borderColor:'#005eb8', backgroundColor:'rgba(0,94,184,0.1)', fill:true, tension:0.3},
+          {label:pb.demographics.name||'Patient B', data:years.map(function(y){return ycB[y]||0;}), borderColor:'#d4351c', backgroundColor:'rgba(212,53,28,0.1)', fill:true, tension:0.3}
+        ]
+      },
+      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top'}}, scales:{y:{beginAtZero:true, title:{display:true, text:'Contacts'}}}}
+    });
+  }
+
+  // Side-by-side donut charts
+  destroyChart('compare-donut-a'); destroyChart('compare-donut-b');
+  var donutTypes = ['consultation','telephone_consultation','online_consultation','prescription','referral','lab_result','letter','secondary_care','admin','unknown'];
+  function makeDonut(canvasId, chartKey, tc, label) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    var filtered = donutTypes.filter(function(t){return tc[t];});
+    _state.charts[chartKey] = new Chart(canvas.getContext('2d'), {
+      type:'doughnut',
+      data:{
+        labels:filtered.map(function(t){return TYPE_LABELS[t]||t;}),
+        datasets:[{data:filtered.map(function(t){return tc[t];}), backgroundColor:filtered.map(function(t){return TYPE_COLORS[t]||'#768692';})}]
+      },
+      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{font:{size:10}}}, title:{display:true, text:label}}}
+    });
+  }
+  makeDonut('chart-compare-donut-a','compare-donut-a', tca, pa.demographics.name||'Patient A');
+  makeDonut('chart-compare-donut-b','compare-donut-b', tcb, pb.demographics.name||'Patient B');
+}
+
+function removeComparison() {
+  _patients = [];
+  _compareMode = false;
+  var ct = document.getElementById('compare-tab'); if (ct) ct.style.display = 'none';
+  destroyChart('compare-yearly'); destroyChart('compare-donut-a'); destroyChart('compare-donut-b');
+  var banner = document.getElementById('compare-banner'); if (banner) banner.innerHTML = '';
+  var table = document.getElementById('compare-table'); if (table) table.innerHTML = '';
+  switchTab('dashboard');
+}
+
+// Expose functions to window for inline onclick handlers
+window.openSearch = openSearch;
+window.closeSearch = closeSearch;
+window.runSearch = runSearch;
+window.clearPatient = clearPatient;
+window.exportSummary = exportSummary;
+window.exportToClipboard = exportToClipboard;
+window.toggleToolbarPin = toggleToolbarPin;
+window.startComparison = startComparison;
+window.cancelComparison = cancelComparison;
+window.removeComparison = removeComparison;
+window.handleCompareDrop = handleCompareDrop;
+window.handleCompareFile = handleCompareFile;
+window.clearProblemFilter = clearProblemFilter;
+window.toggleChronology = toggleChronology;
+window.filterLetters = filterLetters;
+window.destroyChart = destroyChart;
 
 })();
 </script>
