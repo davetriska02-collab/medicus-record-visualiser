@@ -1,102 +1,90 @@
 # Medicus Patient Record Visualiser
 
-A single-file offline clinical tool for visualising Medicus EPR patient record exports. Drop a PDF in. Everything runs in the browser. Nothing leaves your machine.
+> Drop a Medicus PDF onto one file. Get a searchable, visual patient record in your browser. Nothing leaves your computer.
+
+Made for GPs, practice managers, safeguarding leads, and clinical reviewers who want a fast way to see what's actually in a long patient record — without installing anything, without sending data anywhere, and without needing any technical skills.
 
 ---
 
 ## Download
 
-**[Download visualiser.html](https://github.com/davetriska02-collab/medicus-record-visualiser/releases/latest/download/visualiser.html)**
+### **[Click here to download the visualiser](https://github.com/davetriska02-collab/medicus-record-visualiser/releases/latest/download/visualiser.html)**
 
-That's it. One file. ~2MB. No installer, no admin rights, no dependencies.
-
----
-
-## How to use
-
-1. Download `visualiser.html`
-2. Save it anywhere — desktop, USB drive, network share
-3. Open it in Chrome, Edge, or Firefox
-4. Drop a Medicus patient record PDF onto the page
-
-The file works entirely offline. No internet connection required after download. No data is ever transmitted anywhere.
+One file. About 2 MB. No installer. No admin rights. No sign-up.
 
 ---
 
-## What it shows
+## How to use it (3 steps)
 
-### Dashboard
-- Summary stat cards (contacts, prescriptions, referrals, investigations)
-- **Attendance Velocity** — contact rate trend across three time periods (early / mid / recent)
-- **Gaps in Care** — flags statistically unusual gaps between consultations (mean + 2SD, minimum 180 days)
-- **Complexity Score** — 0–100 composite score across contact volume, prescriptions, referrals, investigations, clinician diversity, and record span
-- Referral breakdown — click the Referrals card to see destination breakdown and dated list
-- Contacts per year bar chart + entry type donut chart
+1. **Download** the file above. It's a single `.html` file — save it to your desktop, Documents, a USB stick, or a shared drive. Wherever is convenient.
+2. **Open it** by double-clicking. It opens in your usual browser (Chrome, Edge, Firefox, Safari — they all work).
+3. **Drop a PDF** onto the page. A Medicus patient record export is what it's designed for.
 
-### Timeline
-- Full chronological scatter plot of all entries, filterable by type and date range
-- **Safeguarding Chronology** — one-click panel showing all safeguarding-flagged entries in date order
-- **Problem-linked filtering** — click any cell in the Problems heatmap to filter the timeline to related entries; badge shows active filter
+That's it. The whole patient record becomes interactive in a few seconds.
 
-### Contact Rates
-- Stacked bar chart by year and entry type
-- Year-by-year breakdown table
-- Clinician frequency table — click any name to filter the timeline to their entries
-- **Clinician Continuity Index** — UPC (Usual Provider of Care) and CPCI (Consecutive-pair continuity) metrics
-
-### Clinician Continuity
-- D3 heatmap of contacts per month per clinician
-- Colour intensity shows frequency
-
-### Investigations
-- Stat cards (total, unique types, date range)
-- Investigations per year chart
-- Category and record-type breakdown
-- Searchable entry list
-
-### Problems & Medications
-- Problems activity heatmap (years × problems) — click a cell to filter the Timeline
-- New problems per year bar chart
-- Raw problems summary text
-- Searchable prescription list
-- **Medication Timeline** — D3 Gantt chart of top 20 drugs plotted across the record period
-
-### Letters & Correspondence
-- Yearly chart of correspondence volume
-- Stat cards (total, secondary care letters, most recent, distinct authors)
-- Filterable list by year and record type
-
-### Global
-- **Full-text search** — press `Ctrl+K` (or `⌘K` on Mac) to search across all record entries; matches are highlighted
-- **Export Summary** — click the Export button in the header to open a print-ready summary page (patient banner, overview stats, top clinicians, 10 most recent entries)
+If your browser asks whether you trust the file — yes, it's just an HTML page. It's not an executable, doesn't install anything, and can't change anything on your computer.
 
 ---
 
-## Compatibility
+## What you get
 
-| Browser | Status |
-|---------|--------|
-| Chrome 90+ | Supported |
-| Edge 90+ | Supported |
-| Firefox 88+ | Supported |
-| Safari 15+ | Supported |
+### At a glance
+- **Dashboard** — headline stats, years covered, top clinicians, contact type breakdown
+- **Complexity Score** — a 0–100 score summarising how involved a patient's care has been
+- **Attendance Velocity** — is this patient's contact rate rising, falling, or steady over time?
+- **Gaps in Care** — highlights unusually long gaps between consultations
+- **Clinician Continuity Index** — measures how consistent a patient's care team has been
 
-Does not require any browser extensions, plugins, or elevated permissions.
+### Deep-dive views
+- **Timeline** — every entry plotted chronologically. Filter by type, date range, or clinician. Click any point for full detail.
+- **Safeguarding Chronology** — one-click view of all safeguarding-flagged entries in date order
+- **Investigations** — blood tests, imaging, and reports, with a yearly trend chart
+- **Prescriptions** — searchable list and medication timeline (Gantt chart of the top 20 drugs)
+- **Problems & Medications** — activity heatmap showing which problems flared up in which years
+- **Letters & Correspondence** — hospital letters, clinic outcomes, discharge summaries
+- **Patient Comparison** — load a second patient and compare them side-by-side (useful for siblings, household members, or audit)
+
+### Tools always at hand
+- **Floating toolbar** — sits in the corner on every view. Pin it where you like.
+- **Copy Summary** — one click copies a plain-text summary to your clipboard. Paste it into EMIS, an email, or a referral letter.
+- **Search** — `Ctrl+K` (or `⌘K` on Mac) to search the entire record with highlighted matches.
+- **Export any chart as an image** — hover over a chart and click the download button to save it as a PNG for meeting notes, MDT discussions, or reports.
 
 ---
 
-## Information governance
+## Why it's safe to use with real patient data
 
-- All processing is local. The PDF is parsed entirely in the browser using an embedded pdf.js library.
-- No data is sent to any server, API, or third party at any point.
-- Closing the browser tab clears all data from memory.
-- The tool does not write to disk, set cookies, or use localStorage.
-- Suitable for use with identifiable patient data on NHS-managed devices under existing IG policies for locally-run clinical tools.
+- **Nothing is sent anywhere.** The file is entirely self-contained. It has no internet access, no analytics, no tracking.
+- **Nothing is saved.** Closing the browser tab clears everything. No cookies, no local storage, no disk writes.
+- **All processing happens in your browser** using PDF-reading code that runs inside the page itself.
+- Suitable for use on NHS-managed devices under existing IG policies for locally-run clinical tools.
+
+If you want to audit the code, it's all in the single HTML file — open it in any text editor and read through.
 
 ---
 
-## Source
+## Browser compatibility
 
-Built by [Dr Dave Triska](https://davetriska.substack.com), GP Partner at Witley & Milford Surgery, as part of the DHSC 10-year programme with Medicus and Surrey Heartlands ICB.
+| Browser | Supported |
+|---------|-----------|
+| Chrome 90+ | ✓ |
+| Edge 90+ | ✓ |
+| Firefox 88+ | ✓ |
+| Safari 15+ | ✓ |
+
+No extensions, no plugins, no elevated permissions required.
+
+---
+
+## Questions or problems?
+
+- Open an [issue on GitHub](https://github.com/davetriska02-collab/medicus-record-visualiser/issues) — tell me what went wrong, what browser you're using, and roughly what was in the PDF (no patient details please).
+- Feature requests welcome.
+
+---
+
+## About
+
+Built by [Dr Dave Triska](https://davetriska.substack.com), GP, as part of the DHSC 10-year programme with Medicus and Surrey Heartlands ICB.
 
 Libraries bundled inline: [pdf.js](https://mozilla.github.io/pdf.js/) · [D3.js v7](https://d3js.org/) · [Chart.js](https://www.chartjs.org/)
